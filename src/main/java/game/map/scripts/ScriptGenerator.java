@@ -699,6 +699,15 @@ public class ScriptGenerator
 		if (npcs.isEmpty())
 			return;
 
+		mainHooks.add("Call  MakeNpcs  ( .False $NpcGroupList_Main )");
+
+		lines.add("#new:NpcGroupList $NpcGroupList_Main");
+		lines.add("{");
+		lines.add(String.format("\t%d` $NpcGroup_Default 00000000", npcs.size()));
+		lines.add("\t00000000 00000000 00000000");
+		lines.add("}");
+		lines.add("");
+
 		lines.add("#new:NpcGroup $NpcGroup_Default");
 		lines.add("{");
 
@@ -711,13 +720,13 @@ public class ScriptGenerator
 			if (name.contains(" "))
 				throw new InvalidInputException("NPC " + name + " contains a space");
 
-			defineLines.add(String.format("#define .NpcID:%s %d`", npc.getName(), i));
+			defineLines.add(String.format("#define .NpcID:%s %d`", name, i));
 
-			lines.add(String.format("\t.NpcID:%s $NpcSettings_80242BB0 ~Vec3f:%s", npc.getName(), npc.getName()));
-			lines.add(String.format("\t%X $Script_Init_80243C04 00000000 00000000 0000010E", npcComponent.flags.get()));
+			lines.add(String.format("\t.NpcID:%s $NpcSettings_%s ~Vec3f:%s", name, name, name));
+			lines.add(String.format("\t%08X $Script_Init_%s 00000000 00000000 0000010E", npcComponent.flags.get(), name));
 			lines.add("\t~NoDrops");
-			lines.add(String.format("\t~Movement:%s", npc.getName()));
-			lines.add(String.format("\t~AnimationTable:%s", npc.getName()));
+			lines.add(String.format("\t~Movement:%s", name));
+			lines.add(String.format("\t~AnimationTable:%s", name));
 			lines.add("\t00000000 00000000 00000000 001A0008");
 
 			if (npcs.get(npcs.size() - 1) != npc)
@@ -726,6 +735,20 @@ public class ScriptGenerator
 
 		lines.add("}");
 		lines.add("");
+
+		for (Marker npc : npcs) {
+			String name = npc.getName();
+			NpcComponent npcComponent = npc.npcComponent;
+
+			lines.add(String.format("#new:NpcSettings $NpcSettings_%s", name));
+			lines.add("{");
+			lines.add(String.format(
+					"\t00000000 %04Xs %04Xs 00000000 00000000 00000000 00000000 00000000",
+					npcComponent.height.get(), npcComponent.radius.get()));
+			lines.add(String.format("\t00000000 00000000 00000000 %04Xs 0000s", npcComponent.level.get()));
+			lines.add("}");
+			lines.add("");
+		}
 	}
 
 	private void addCameraTargets(List<String> camLines) throws InvalidInputException

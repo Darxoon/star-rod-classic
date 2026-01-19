@@ -51,6 +51,10 @@ public class NpcSubpanel extends JPanel
 	private final HexTextField flagsField;
 	private JButton editFlagsButton;
 
+	private final IntTextField radiusField;
+	private final IntTextField heightField;
+	private final IntTextField levelField;
+
 	public NpcSubpanel(MarkerInfoPanel parent)
 	{
 		this.parent = parent;
@@ -61,6 +65,7 @@ public class NpcSubpanel extends JPanel
 		genDefaultGroup.addActionListener((e) -> MapEditor.execute(
 				parent.getData().npcComponent.genDefaultGroup.mutator(genDefaultGroup.isSelected())));
 
+		// NPC flags
 		flagsField = new HexTextField(8, (v) -> {
 			if (parent.ignoreEvents() || parent.getData() == null)
 				return;
@@ -90,11 +95,36 @@ public class NpcSubpanel extends JPanel
 			}
 		});
 
-		add(genDefaultGroup);
+		// NPC settings
+		radiusField = new IntTextField((v) -> {
+			if (parent.ignoreEvents() || parent.getData() == null)
+				return;
+			MapEditor.execute(parent.getData().npcComponent.radius.mutator(v));
+		});
+		heightField = new IntTextField((v) -> {
+			if (parent.ignoreEvents() || parent.getData() == null)
+				return;
+			MapEditor.execute(parent.getData().npcComponent.height.mutator(v));
+		});
+		levelField = new IntTextField((v) -> {
+			if (parent.ignoreEvents() || parent.getData() == null)
+				return;
+			MapEditor.execute(parent.getData().npcComponent.level.mutator(v));
+		});
 
 		add(new JLabel("NPC Flags"), "split 3, w 28%!");
-		add(flagsField, "w 50%!");
+		add(flagsField, "w 40%!");
 		add(editFlagsButton);
+
+		add(genDefaultGroup);
+
+		add(new JLabel("NPC Settings"), "gaptop 8");
+		add(new JLabel("Height"), "split 2, w 28%!");
+		add(heightField, "w 40%!");
+		add(new JLabel("Radius"), "split 2, w 28%!");
+		add(radiusField, "w 40%!");
+		add(new JLabel("Level"), "split 2, w 28%!");
+		add(levelField, "w 40%!");
 	}
 
 	public void onUpdateFields()
@@ -103,6 +133,10 @@ public class NpcSubpanel extends JPanel
 
 		genDefaultGroup.setSelected(data.genDefaultGroup.get());
 		flagsField.setValue(data.flags.get());
+
+		radiusField.setValue(data.radius.get());
+		heightField.setValue(data.height.get());
+		levelField.setValue(data.level.get());
 	}
 
 }

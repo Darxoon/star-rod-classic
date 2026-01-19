@@ -52,7 +52,7 @@ public class FlagEditorPanel extends JPanel
 		checkBoxes = new JCheckBox[flags.length];
 
 		setLayout(new MigLayout("fillx, ins 8 0 8 8"));
-		add(valueField, "w 80!, gapbottom 8, wrap");
+		add(valueField, "w 90!, gapbottom 8, wrap");
 
 		for (int i = 0; i < flags.length; i++) {
 			flagBits[i] = flags[i].bits;

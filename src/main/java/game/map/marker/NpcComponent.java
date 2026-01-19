@@ -81,6 +81,17 @@ public class NpcComponent extends BaseMarkerComponent
 	public EditableField<Integer> flags = EditableFieldFactory.create(0)
 			.setCallback(notifyGeneral).setName("Flags").build();
 
+	// npc settings
+
+	public EditableField<Integer> height = EditableFieldFactory.create(0)
+			.setCallback(notifyGeneral).setName("Height").build();
+
+	public EditableField<Integer> radius = EditableFieldFactory.create(0)
+			.setCallback(notifyGeneral).setName("Radius").build();
+
+	public EditableField<Integer> level = EditableFieldFactory.create(0)
+			.setCallback(notifyGeneral).setName("Level").build();
+
 	// movement
 
 	public EditableField<MoveType> moveType = EditableFieldFactory.create(MoveType.Stationary)
@@ -173,8 +184,11 @@ public class NpcComponent extends BaseMarkerComponent
 	public void toXML(XmlWriter xmw)
 	{
 		XmlTag npcTag = xmw.createTag(TAG_NPC, true);
-		xmw.addBoolean(npcTag, ATTR_NPC_GEN_DEFAULT, genDefaultGroup.get());
 		xmw.addHex(npcTag, ATTR_NPC_FLAGS, flags.get());
+		xmw.addBoolean(npcTag, ATTR_NPC_GEN_DEFAULT, genDefaultGroup.get());
+		xmw.addInt(npcTag, ATTR_NPC_HEIGHT, height.get());
+		xmw.addInt(npcTag, ATTR_NPC_RADIUS, radius.get());
+		xmw.addInt(npcTag, ATTR_NPC_LEVEL, level.get());
 		xmw.printTag(npcTag);
 
 		XmlTag movementTag = xmw.createTag(TAG_MOVEMENT, true);
@@ -195,11 +209,20 @@ public class NpcComponent extends BaseMarkerComponent
 	{
 		Element npcElem = xmr.getUniqueTag(markerElem, TAG_NPC);
 		if (npcElem != null) {
+			xmr.requiresAttribute(npcElem, ATTR_NPC_FLAGS);
+			flags.set(xmr.readHex(npcElem, ATTR_NPC_FLAGS));
+
 			xmr.requiresAttribute(npcElem, ATTR_NPC_GEN_DEFAULT);
 			genDefaultGroup.set(xmr.readBoolean(npcElem, ATTR_NPC_GEN_DEFAULT));
 
-			xmr.requiresAttribute(npcElem, ATTR_NPC_FLAGS);
-			flags.set(xmr.readHex(npcElem, ATTR_NPC_FLAGS));
+			xmr.requiresAttribute(npcElem, ATTR_NPC_HEIGHT);
+			height.set(xmr.readInt(npcElem, ATTR_NPC_HEIGHT));
+
+			xmr.requiresAttribute(npcElem, ATTR_NPC_RADIUS);
+			radius.set(xmr.readInt(npcElem, ATTR_NPC_RADIUS));
+
+			xmr.requiresAttribute(npcElem, ATTR_NPC_LEVEL);
+			level.set(xmr.readInt(npcElem, ATTR_NPC_LEVEL));
 		}
 
 		Element movementElem = xmr.getUniqueRequiredTag(markerElem, TAG_MOVEMENT);
