@@ -55,6 +55,14 @@ public class NpcSubpanel extends JPanel
 	private final IntTextField heightField;
 	private final IntTextField levelField;
 
+	private final JCheckBox hasInit;
+	private final JCheckBox hasInteract;
+	private final JCheckBox hasIdle;
+	private final JCheckBox hasAI;
+	private final JCheckBox hasHit;
+	private final JCheckBox hasDefeat;
+	private final JCheckBox hasAux;
+
 	public NpcSubpanel(MarkerInfoPanel parent)
 	{
 		this.parent = parent;
@@ -112,6 +120,30 @@ public class NpcSubpanel extends JPanel
 			MapEditor.execute(parent.getData().npcComponent.level.mutator(v));
 		});
 
+		// callbacks
+		hasInit = new JCheckBox(" Always has Init callback");
+		hasInit.addActionListener((e) -> MapEditor.execute(
+				parent.getData().npcComponent.hasInit.mutator(hasInit.isSelected())));
+
+		hasInteract = new JCheckBox(" Has Interact callback");
+		hasInteract.addActionListener((e) -> MapEditor.execute(
+				parent.getData().npcComponent.hasInteract.mutator(hasInteract.isSelected())));
+		hasIdle = new JCheckBox(" Has Idle callback");
+		hasIdle.addActionListener((e) -> MapEditor.execute(
+				parent.getData().npcComponent.hasIdle.mutator(hasIdle.isSelected())));
+		hasAI = new JCheckBox(" Has AI callback");
+		hasAI.addActionListener((e) -> MapEditor.execute(
+				parent.getData().npcComponent.hasAI.mutator(hasAI.isSelected())));
+		hasHit = new JCheckBox(" Has Hit callback");
+		hasHit.addActionListener((e) -> MapEditor.execute(
+				parent.getData().npcComponent.hasHit.mutator(hasHit.isSelected())));
+		hasDefeat = new JCheckBox(" Has Defeat callback");
+		hasDefeat.addActionListener((e) -> MapEditor.execute(
+				parent.getData().npcComponent.hasDefeat.mutator(hasDefeat.isSelected())));
+		hasAux = new JCheckBox(" Has Aux callback");
+		hasAux.addActionListener((e) -> MapEditor.execute(
+				parent.getData().npcComponent.hasAux.mutator(hasAux.isSelected())));
+
 		add(new JLabel("NPC Flags"), "split 3, w 28%!");
 		add(flagsField, "w 40%!");
 		add(editFlagsButton);
@@ -125,6 +157,14 @@ public class NpcSubpanel extends JPanel
 		add(radiusField, "w 40%!");
 		add(new JLabel("Level"), "split 2, w 28%!");
 		add(levelField, "w 40%!");
+
+		add(hasInit, "gaptop 12");
+		add(hasInteract);
+		add(hasIdle);
+		add(hasAI);
+		add(hasHit);
+		add(hasDefeat);
+		add(hasAux);
 	}
 
 	public void onUpdateFields()
@@ -137,6 +177,14 @@ public class NpcSubpanel extends JPanel
 		radiusField.setValue(data.radius.get());
 		heightField.setValue(data.height.get());
 		levelField.setValue(data.level.get());
+
+		hasInit.setSelected(data.hasInit.get());
+		hasInteract.setSelected(data.hasInteract.get());
+		hasIdle.setSelected(data.hasIdle.get());
+		hasAI.setSelected(data.hasAI.get());
+		hasHit.setSelected(data.hasHit.get());
+		hasDefeat.setSelected(data.hasDefeat.get());
+		hasAux.setSelected(data.hasAux.get());
 	}
 
 }

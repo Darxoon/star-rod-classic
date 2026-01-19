@@ -722,8 +722,12 @@ public class ScriptGenerator
 
 			defineLines.add(String.format("#define .NpcID:%s %d`", name, i));
 
+			String initScript = npcComponent.hasInitScript()
+					? String.format("$Script_Init_%s", name)
+					: "0000000";
+
 			lines.add(String.format("\t.NpcID:%s $NpcSettings_%s ~Vec3f:%s", name, name, name));
-			lines.add(String.format("\t%08X $Script_Init_%s 00000000 00000000 0000010E", npcComponent.flags.get(), name));
+			lines.add(String.format("\t%08X %s 00000000 00000000 0000010E", npcComponent.flags.get(), initScript));
 			lines.add("\t~NoDrops");
 			lines.add(String.format("\t~Movement:%s", name));
 			lines.add(String.format("\t~AnimationTable:%s", name));
@@ -748,7 +752,53 @@ public class ScriptGenerator
 			lines.add(String.format("\t00000000 00000000 00000000 %04Xs 0000s", npcComponent.level.get()));
 			lines.add("}");
 			lines.add("");
+
+			if (npcComponent.hasInitScript()) {
+				lines.add(String.format("#new:Script $Script_Init_%s", name));
+				lines.add("{");
+
+				if (npcComponent.hasInteract.get())
+					lines.add(String.format("\tCall  BindNpcInteract   ( .Npc:Self $Script_Interact_%s )", name));
+				if (npcComponent.hasIdle.get())
+					lines.add(String.format("\tCall  BindNpcIdle       ( .Npc:Self $Script_Idle_%s )", name));
+				if (npcComponent.hasAI.get())
+					lines.add(String.format("\tCall  BindNpcAI         ( .Npc:Self $Script_AI_%s )", name));
+				if (npcComponent.hasHit.get())
+					lines.add(String.format("\tCall  BindNpcHit        ( .Npc:Self $Script_Hit_%s )", name));
+				if (npcComponent.hasDefeat.get())
+					lines.add(String.format("\tCall  BindNpcDefeat     ( .Npc:Self $Script_Defeat_%s )", name));
+				if (npcComponent.hasAux.get())
+					lines.add(String.format("\tCall  BindNpcAux        ( .Npc:Self $Script_Aux_%s )", name));
+
+				lines.add("\tReturn");
+				lines.add("\tEnd");
+				lines.add("}");
+				lines.add("");
+
+				if (npcComponent.hasInteract.get())
+					addEmptyScript(String.format("Script_Interact_%s", name), lines);
+				if (npcComponent.hasIdle.get())
+					addEmptyScript(String.format("Script_Idle_%s", name), lines);
+				if (npcComponent.hasAI.get())
+					addEmptyScript(String.format("Script_AI_%s", name), lines);
+				if (npcComponent.hasHit.get())
+					addEmptyScript(String.format("Script_Hit_%s", name), lines);
+				if (npcComponent.hasDefeat.get())
+					addEmptyScript(String.format("Script_Defeat_%s", name), lines);
+				if (npcComponent.hasAux.get())
+					addEmptyScript(String.format("Script_Aux_%s", name), lines);
+			}
 		}
+	}
+
+	private void addEmptyScript(String name, List<String> lines)
+	{
+		lines.add(String.format("#new:Script $%s", name));
+		lines.add("{");
+		lines.add("\tReturn");
+		lines.add("\tEnd");
+		lines.add("}");
+		lines.add("");
 	}
 
 	private void addCameraTargets(List<String> camLines) throws InvalidInputException
