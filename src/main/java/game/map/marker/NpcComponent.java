@@ -48,6 +48,9 @@ import util.xml.XmlWrapper.XmlWriter;
 
 public class NpcComponent extends BaseMarkerComponent
 {
+	private final Consumer<Object> notifyGeneral = (o) -> {
+		parentMarker.updateListeners(MarkerInfoPanel.tag_NPCTab);
+	};
 	private final Consumer<Object> notifyMovement = (o) -> {
 		parentMarker.updateListeners(MarkerInfoPanel.tag_NPCMovementTab);
 	};
@@ -71,6 +74,12 @@ public class NpcComponent extends BaseMarkerComponent
 	private int[] animations = new int[Npc.ANIM_TABLE_SIZE];
 	public transient int previewAnimIndex;
 	public transient Sprite previewSprite = null;
+
+	public EditableField<Boolean> genDefaultGroup = EditableFieldFactory.create(false)
+			.setCallback(notifyGeneral).setName("Add to default NPC Group").build();
+
+	public EditableField<Integer> flags = EditableFieldFactory.create(0)
+			.setCallback(notifyGeneral).setName("Flags").build();
 
 	// movement
 
@@ -163,6 +172,11 @@ public class NpcComponent extends BaseMarkerComponent
 	@Override
 	public void toXML(XmlWriter xmw)
 	{
+		XmlTag npcTag = xmw.createTag(TAG_NPC, true);
+		xmw.addBoolean(npcTag, ATTR_NPC_GEN_DEFAULT, genDefaultGroup.get());
+		xmw.addHex(npcTag, ATTR_NPC_FLAGS, flags.get());
+		xmw.printTag(npcTag);
+
 		XmlTag movementTag = xmw.createTag(TAG_MOVEMENT, true);
 		xmw.addEnum(movementTag, ATTR_MOVEMENT_TYPE, moveType.get());
 		int[] data = getTerritoryData();
@@ -179,6 +193,15 @@ public class NpcComponent extends BaseMarkerComponent
 	@Override
 	public void fromXML(XmlReader xmr, Element markerElem)
 	{
+		Element npcElem = xmr.getUniqueTag(markerElem, TAG_NPC);
+		if (npcElem != null) {
+			xmr.requiresAttribute(npcElem, ATTR_NPC_GEN_DEFAULT);
+			genDefaultGroup.set(xmr.readBoolean(npcElem, ATTR_NPC_GEN_DEFAULT));
+
+			xmr.requiresAttribute(npcElem, ATTR_NPC_FLAGS);
+			flags.set(xmr.readHex(npcElem, ATTR_NPC_FLAGS));
+		}
+
 		Element movementElem = xmr.getUniqueRequiredTag(markerElem, TAG_MOVEMENT);
 
 		xmr.requiresAttribute(movementElem, ATTR_MOVEMENT_TYPE);

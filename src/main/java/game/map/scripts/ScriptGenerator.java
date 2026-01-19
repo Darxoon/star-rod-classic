@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import game.map.marker.NpcComponent;
 import org.apache.commons.io.FileUtils;
 
 import app.Resource;
@@ -89,26 +90,44 @@ public class ScriptGenerator
 		this.map = map;
 		this.index = new MapIndex(map);
 
+		List<Marker> npcList = new ArrayList<>();
+		List<String> npcNames = new ArrayList<>();
+
 		List<Marker> entityList = new ArrayList<>();
 		List<String> entityNames = new ArrayList<>();
+
 		for (Marker m : map.markerTree) {
-			if (m.getType() == MarkerType.Entity) {
-				String entityName = m.getName();
-				if (entityNames.contains(entityName))
-					throw new InvalidInputException("Entity name is not unique: " + entityName);
-				entityNames.add(entityName);
+			switch (m.getType()) {
+				case NPC: {
+					String npcName = m.getName();
+					if (npcNames.contains(npcName))
+						throw new InvalidInputException("NPC name is not unique: " + npcName);
+					npcNames.add(npcName);
 
-				if (m.entityComponent.type.get() == EntityType.SavePoint)
-					checkForSavePoint = true;
+					if (m.npcComponent.genDefaultGroup.get()) {
+						npcList.add(m);
+					}
+					break;
+				}
+				case Entity: {
+					String entityName = m.getName();
+					if (entityNames.contains(entityName))
+						throw new InvalidInputException("Entity name is not unique: " + entityName);
+					entityNames.add(entityName);
 
-				entityList.add(m);
+					if (m.entityComponent.type.get() == EntityType.SavePoint)
+						checkForSavePoint = true;
+
+					entityList.add(m);
+					break;
+				}
 			}
 		}
 
 		List<String> lines = new LinkedList<>();
 
 		addInitScript(lines);
-		// NPCs
+		addNPCs(npcList, lines);
 		addEntities(entityList, lines);
 		addCameraTargets(lines);
 		addMusic(lines);
@@ -673,6 +692,40 @@ public class ScriptGenerator
 			lines.add("}");
 			lines.add("");
 		}
+	}
+
+	private void addNPCs(List<Marker> npcs, List<String> lines) throws InvalidInputException
+	{
+		if (npcs.isEmpty())
+			return;
+
+		lines.add("#new:NpcGroup $NpcGroup_Default");
+		lines.add("{");
+
+		for (int i = 0; i < npcs.size(); i++) {
+			Marker npc = npcs.get(i);
+
+			NpcComponent npcComponent = npc.npcComponent;
+			String name = npc.getName();
+
+			if (name.contains(" "))
+				throw new InvalidInputException("NPC " + name + " contains a space");
+
+			defineLines.add(String.format("#define .NpcID:%s %d`", npc.getName(), i));
+
+			lines.add(String.format("\t.NpcID:%s $NpcSettings_80242BB0 ~Vec3f:%s", npc.getName(), npc.getName()));
+			lines.add(String.format("\t%X $Script_Init_80243C04 00000000 00000000 0000010E", npcComponent.flags.get()));
+			lines.add("\t~NoDrops");
+			lines.add(String.format("\t~Movement:%s", npc.getName()));
+			lines.add(String.format("\t~AnimationTable:%s", npc.getName()));
+			lines.add("\t00000000 00000000 00000000 001A0008");
+
+			if (npcs.get(npcs.size() - 1) != npc)
+				lines.add("");
+		}
+
+		lines.add("}");
+		lines.add("");
 	}
 
 	private void addCameraTargets(List<String> camLines) throws InvalidInputException
