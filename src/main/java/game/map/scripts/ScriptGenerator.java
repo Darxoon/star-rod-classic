@@ -739,7 +739,7 @@ public class ScriptGenerator
 			}
 
 			lines.add(String.format("\t.NpcID:%s $NpcSettings_%s ~Vec3f:%s", name, name, name));
-			lines.add(String.format("\t%08X %s 00000000 00000000 0000010E", npcComponent.flags.get(), initScript));
+			lines.add(String.format("\t%08X %s 00000000 00000000 %08X", npcComponent.flags.get(), initScript, (int) npc.yaw.getAngle()));
 			lines.add("\t~NoDrops");
 			lines.add(String.format("\t~Movement:%s", name));
 			lines.add(String.format("\t~AnimationTable:%s", name));
