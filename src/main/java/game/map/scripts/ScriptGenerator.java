@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import game.map.marker.NpcComponent;
+import game.string.PMString;
 import org.apache.commons.io.FileUtils;
 
 import app.Resource;
@@ -726,12 +727,23 @@ public class ScriptGenerator
 					? String.format("$Script_Init_%s", name)
 					: "0000000";
 
+			String tattleString = npcComponent.tattleString.get();
+			int tattleStringID = 0;
+			if (tattleString != null && !tattleString.isEmpty() && !"00-000".equals(tattleString)) {
+				PMString string = ProjectDatabase.gameStrings.getMessage(tattleString);
+
+				if (string == null)
+					throw new InvalidInputException("NPC " + name + " has an invalid tattle string ('" + tattleString + "')");
+
+				tattleStringID = string.getID();
+			}
+
 			lines.add(String.format("\t.NpcID:%s $NpcSettings_%s ~Vec3f:%s", name, name, name));
 			lines.add(String.format("\t%08X %s 00000000 00000000 0000010E", npcComponent.flags.get(), initScript));
 			lines.add("\t~NoDrops");
 			lines.add(String.format("\t~Movement:%s", name));
 			lines.add(String.format("\t~AnimationTable:%s", name));
-			lines.add("\t00000000 00000000 00000000 001A0008");
+			lines.add(String.format("\t00000000 00000000 00000000 %08X", tattleStringID));
 
 			if (npcs.get(npcs.size() - 1) != npc)
 				lines.add("");

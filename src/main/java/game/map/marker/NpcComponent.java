@@ -81,6 +81,9 @@ public class NpcComponent extends BaseMarkerComponent
 	public EditableField<Integer> flags = EditableFieldFactory.create(0)
 			.setCallback(notifyGeneral).setName("Flags").build();
 
+	public EditableField<String> tattleString = EditableFieldFactory.create("00-000")
+			.setCallback(notifyGeneral).setName("Tattle String").build();
+
 	public EditableField<Boolean> hasInit = EditableFieldFactory.create(false)
 			.setCallback(notifyGeneral).setName(new StandardBoolName("Init Callback")).build();
 
@@ -215,6 +218,7 @@ public class NpcComponent extends BaseMarkerComponent
 		};
 		XmlTag npcTag = xmw.createTag(TAG_NPC, true);
 		xmw.addHex(npcTag, ATTR_NPC_FLAGS, flags.get());
+		xmw.addAttribute(npcTag, ATTR_NPC_TATTLE_STRING, tattleString.get());
 		xmw.addBoolean(npcTag, ATTR_NPC_GEN_DEFAULT, genDefaultGroup.get());
 		xmw.addInt(npcTag, ATTR_NPC_HEIGHT, height.get());
 		xmw.addInt(npcTag, ATTR_NPC_RADIUS, radius.get());
@@ -242,6 +246,9 @@ public class NpcComponent extends BaseMarkerComponent
 		if (npcElem != null) {
 			xmr.requiresAttribute(npcElem, ATTR_NPC_FLAGS);
 			flags.set(xmr.readHex(npcElem, ATTR_NPC_FLAGS));
+
+			xmr.requiresAttribute(npcElem, ATTR_NPC_TATTLE_STRING);
+			tattleString.set(xmr.getAttribute(npcElem, ATTR_NPC_TATTLE_STRING));
 
 			xmr.requiresAttribute(npcElem, ATTR_NPC_GEN_DEFAULT);
 			genDefaultGroup.set(xmr.readBoolean(npcElem, ATTR_NPC_GEN_DEFAULT));

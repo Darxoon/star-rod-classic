@@ -3,6 +3,8 @@ package game.map.editor.ui.info.marker;
 import app.SwingUtils;
 import game.map.editor.MapEditor;
 import game.map.marker.NpcComponent;
+import game.shared.ProjectDatabase;
+import game.string.PMString;
 import net.miginfocom.swing.MigLayout;
 import util.ui.*;
 
@@ -51,6 +53,9 @@ public class NpcSubpanel extends JPanel
 	private final HexTextField flagsField;
 	private JButton editFlagsButton;
 
+	private final StringField tattleStringField;
+	private final JButton chooseTattleStringButton;
+
 	private final IntTextField radiusField;
 	private final IntTextField heightField;
 	private final IntTextField levelField;
@@ -98,7 +103,28 @@ public class NpcSubpanel extends JPanel
 				int newValue = flagPanel.getValue();
 
 				if (npcComponent.flags.get() != newValue) {
-					MapEditor.execute(parent.getData().npcComponent.flags.mutator(newValue));
+					MapEditor.execute(npcComponent.flags.mutator(newValue));
+				}
+			}
+		});
+
+		// tattle string
+		tattleStringField = new StringField(JTextField.LEADING, (s) -> {
+			NpcComponent npcComponent = parent.getData().npcComponent;
+
+			if (!s.equals(npcComponent.tattleString.get())) {
+				MapEditor.execute(npcComponent.tattleString.mutator(s));
+			}
+		});
+		chooseTattleStringButton = new JButton("Choose");
+		chooseTattleStringButton.addActionListener((e) -> {
+			NpcComponent npcComponent = parent.getData().npcComponent;
+
+			PMString msg = ProjectDatabase.gameStrings.chooseMessage("Choose Short Description");
+			if (msg != null) {
+				String s = msg.getIdentifier();
+				if (!s.equals(npcComponent.tattleString.get())) {
+					MapEditor.execute(npcComponent.tattleString.mutator(s));
 				}
 			}
 		});
@@ -148,6 +174,10 @@ public class NpcSubpanel extends JPanel
 		add(flagsField, "w 40%!");
 		add(editFlagsButton);
 
+		add(new JLabel("Tattle String"), "split 3, w 28%!");
+		add(tattleStringField, "w 40%!");
+		add(chooseTattleStringButton);
+
 		add(genDefaultGroup);
 
 		add(new JLabel("NPC Settings"), "gaptop 8");
@@ -173,6 +203,8 @@ public class NpcSubpanel extends JPanel
 
 		genDefaultGroup.setSelected(data.genDefaultGroup.get());
 		flagsField.setValue(data.flags.get());
+
+		tattleStringField.setText(data.tattleString.get());
 
 		radiusField.setValue(data.radius.get());
 		heightField.setValue(data.height.get());
