@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import game.map.marker.NpcComponent;
+import game.map.shading.ShadingProfile;
 import game.string.PMString;
 import org.apache.commons.io.FileUtils;
 
@@ -268,7 +269,12 @@ public class ScriptGenerator
 		lines.add("{");
 		lines.add("\tSet   *GB_WorldLocation  .Location:" + map.scripts.locationName.get());
 		if (map.scripts.hasSpriteShading.get()) {
-			String profileName = map.scripts.shadingProfile.get().name.get();
+			ShadingProfile shadingProfile = map.scripts.shadingProfile.get();
+
+			if (shadingProfile == null)
+				throw new InvalidInputException("Map does not have a shading profile selected");
+
+			String profileName = shadingProfile.name.get();
 			lines.add("\tCall  SetSpriteShading   ( ." + ProjectDatabase.SHADING_NAMESPACE + ":" + profileName + " )");
 		}
 		lines.add("\tCall  SetCamPerspective  ( .Cam:Default " + String.format("00000003 %08X %08X %08X )",
