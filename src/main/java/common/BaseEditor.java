@@ -649,16 +649,16 @@ public abstract class BaseEditor extends GLEditor implements Logger.Listener, Mo
 	@Override
 	public void post(Message msg)
 	{
-		Color c = null;
-		switch (msg.priority) {
-			case WARNING:
-			case ERROR:
-				c = SwingUtils.getRedTextColor();
-				break;
-			default:
-				c = SwingUtils.getTextColor();
-				break;
-		}
-		infoLabel.setMessage(msg.text, c);
+//		Color c = null;
+//		switch (msg.priority) {
+//			case WARNING:
+//			case ERROR:
+//				c = SwingUtils.getRedTextColor();
+//				break;
+//			default:
+//				c = SwingUtils.getTextColor();
+//				break;
+//		}
+//		infoLabel.setMessage(msg.text, c);
 	}
 }
