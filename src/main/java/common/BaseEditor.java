@@ -390,13 +390,13 @@ public abstract class BaseEditor extends GLEditor implements Logger.Listener, Mo
 		JScrollPane logScrollPane = new JScrollPane(logTextArea);
 		logScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-		logListener = msg -> {
-			logTextArea.append(msg.text + System.lineSeparator());
-
-			JScrollBar vertical = logScrollPane.getVerticalScrollBar();
-			vertical.setValue(vertical.getMaximum());
-		};
-		Logger.addListener(logListener);
+//		logListener = msg -> {
+//			logTextArea.append(msg.text + System.lineSeparator());
+//
+//			JScrollBar vertical = logScrollPane.getVerticalScrollBar();
+//			vertical.setValue(vertical.getMaximum());
+//		};
+//		Logger.addListener(logListener);
 
 		return ((e) -> {
 			boolean success = false;
